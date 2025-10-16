@@ -54,11 +54,25 @@
             cursor: pointer;
             position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            text-align: center;
             transition: 0.2s;
+            overflow: hidden;
+        }
+
+        .character img {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            margin-bottom: 6px;
+        }
+
+        .character span {
+            font-size: 14px;
+            color: #000;
+            text-shadow: 1px 1px #fff;
         }
 
         .character:hover {
@@ -77,7 +91,7 @@
             top: -8px;
             right: -8px;
             background: #ffc107;
-            color: #c3c3c3;
+            color: #000000;
             font-size: 11px;
             font-weight: bold;
             padding: 3px 4px;
@@ -120,7 +134,6 @@
 
         .right img {
             width: 250px;
-            /* también más grande */
             image-rendering: pixelated;
         }
 
@@ -130,7 +143,7 @@
             margin: 15px 0;
             font-size: 13px;
             line-height: 1.4em;
-            color: #ffffff;
+            color: #000;
         }
 
         .play-btn {
@@ -169,14 +182,14 @@
 
     <script>
         const characters = [
-            { name: "Loader", img: "https://i.imgur.com/6KTzyqV.png", desc: "Alta resistencia y combate cuerpo a cuerpo.", skills: ["Bullet Punch", "Debris Shield", "Rocket Leap"], state: "unlocked" },
-            { name: "Sniper", img: "https://i.imgur.com/2qOaEoB.png", desc: "Ataques de largo alcance y precisión extrema.", skills: ["Aimed Shot", "Camouflage", "Critical Focus"], state: "new" },
-            { name: "Engineer", img: "https://i.imgur.com/z7Eslbp.png", desc: "Crea torretas y barreras defensivas.", skills: ["Deploy Turret", "Shield Dome", "Repair Bot"], state: "unlocked" },
-            { name: "Medic", img: "https://i.imgur.com/oqFGD4T.png", desc: "Especialista en curar y apoyar aliados.", skills: ["Heal Beam", "Revive", "Protective Mist"], state: "locked" },
-            { name: "Scout", img: "https://i.imgur.com/5H0iFYi.png", desc: "Rápido, ágil y experto en exploración.", skills: ["Dash", "Stealth", "Pulse Shot"], state: "unlocked" },
-            { name: "Pyro", img: "https://i.imgur.com/v8bZtuE.png", desc: "Controla el fuego con ataques en área.", skills: ["Flame Burst", "Fire Wall", "Explosion Core"], state: "new" },
-            { name: "Rogue", img: "https://i.imgur.com/RvQxIvi.png", desc: "Asesino veloz con ataques críticos.", skills: ["Backstab", "Shadow Step", "Poison Blade"], state: "unlocked" },
-            { name: "Cyborg", img: "https://i.imgur.com/vwqyl6Y.png", desc: "Fusión de humano y máquina adaptable.", skills: ["Laser Beam", "EMP Blast", "Overdrive"], state: "locked" },
+            { name: "Loader", img: "macha.png", desc: "For some time after its birth, it uses the nutrients that are packed into the seed on its back in order to grow.", skills: ["Bullet Punch", "Debris Shield", "Rocket Leap"], state: "unlocked" },
+            { name: "Sniper", img: "Caterpie.png", desc: " The flame on its tail shows the strength of its life-force. If Charmander is weak, the flame also burns weakly.", skills: ["Aimed Shot", "Camouflage", "Critical Focus"], state: "new" },
+            { name: "Engineer", img: "Charmander.png", desc: "The flame on its tail shows the strength of its life-force. If Charmander is weak, the flame also burns weakly..", skills: ["Deploy Turret", "Shield Dome", "Repair Bot"], state: "unlocked" },
+            { name: "Medic", img: "Diglett.png", desc: "It lives about one yard underground, where it feeds on plant roots. It sometimes appears aboveground.", skills: ["Heal Beam", "Revive", "Protective Mist"], state: "locked" },
+            { name: "Scout", img: "Ekans.png", desc: "It can freely detach its jaw to swallow large prey whole. It can become too heavy to move, however.", skills: ["Dash", "Stealth", "Pulse Shot"], state: "unlocked" },
+            { name: "Pyro", img: "Oddish.png", desc: "Its scientific name is Oddium wanderus. It is said to cover distances as far as 1,000 feet when night falls, walking on its two roots.", skills: ["Flame Burst", "Fire Wall", "Explosion Core"], state: "new" },
+            { name: "Rogue", img: "Paras.png", desc: "Burrows under the ground to gnaw on tree roots. The mushrooms on its back absorb most of the nutrition.", skills: ["Backstab", "Shadow Step", "Poison Blade"], state: "unlocked" },
+            { name: "Cyborg", img: "Pikachu.png", desc: "When it is angered, it immediately discharges the energy stored in the pouches in its cheeks.", skills: ["Laser Beam", "EMP Blast", "Overdrive"], state: "locked" },
         ];
 
         const grid = document.getElementById("charGrid");
@@ -190,7 +203,17 @@
             div.classList.add("character");
             if (c.state === "locked") div.classList.add("locked");
             if (c.state === "new") div.classList.add("new");
-            div.textContent = c.name;
+
+            const img = document.createElement("img");
+            img.src = c.img;
+            img.alt = c.name;
+
+            const span = document.createElement("span");
+            span.textContent = c.name;
+
+            div.appendChild(img);
+            div.appendChild(span);
+
             div.addEventListener("click", () => selectCharacter(i, div));
             grid.appendChild(div);
         });
