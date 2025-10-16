@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selección de personaje</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #ffffff;
+            font-family: 'Consolas', monospace;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            background: #ffffff;
+            padding: 10px;
+            border-bottom: 2px solid #000000;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        .main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            height: calc(100vh - 50px);
+        }
+
+        .left {
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-right: 2px solid #2a2e3a;
+            padding: 20px;
+        }
+
+        /* 🔹 Íconos grandes */
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 200px);
+            grid-gap: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .character {
+            width: 200px;
+            height: 200px;
+            border: 2px solid #cbcbcb;
+            background-color: #c3c3c3;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .character:hover {
+            border-color: #00c3ff;
+            transform: scale(1.03);
+        }
+
+        .character.locked {
+            filter: brightness(0.4);
+            cursor: not-allowed;
+        }
+
+        .character.new::after {
+            content: "NEW";
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ffc107;
+            color: #c3c3c3;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 4px;
+            border-radius: 3px;
+        }
+
+        .character.selected {
+            border-color: #00a2ff;
+            box-shadow: 0 0 10px #0084ff;
+        }
+
+        .skills {
+            background: #b0b0b0;
+            padding: 10px;
+            border: 2px solid #575757;
+            border-radius: 8px;
+            height: 230px;
+            overflow-y: auto;
+        }
+
+        .skills h3 {
+            margin-top: 0;
+            color: #000000;
+        }
+
+        .skill {
+            background: #000000;
+            margin: 5px 0;
+            padding: 6px;
+            border-radius: 4px;
+        }
+
+        .right {
+            background: #dbdbdb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .right img {
+            width: 250px;
+            /* también más grande */
+            image-rendering: pixelated;
+        }
+
+        .desc {
+            text-align: center;
+            width: 80%;
+            margin: 15px 0;
+            font-size: 13px;
+            line-height: 1.4em;
+            color: #ffffff;
+        }
+
+        .play-btn {
+            background: #24f8ff;
+            border: none;
+            padding: 12px 35px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .play-btn:hover {
+            background: #7effee;
+        }
+    </style>
+</head>
+
+<body>
+    <header>Selección de personaje</header>
+    <div class="main">
+        <div class="left">
+            <div class="character-grid" id="charGrid"></div>
+            <div class="skills" id="skills">
+                <h3>SKILLS</h3>
+                <p>Selecciona un personaje para ver sus habilidades.</p>
+            </div>
+        </div>
+        <div class="right">
+            <h2 id="charName">---</h2>
+            <img id="charImage" src="" alt="personaje" />
+            <p class="desc" id="charDesc">Selecciona un personaje a la izquierda.</p>
+            <button class="play-btn" onclick="alert('¡Personaje seleccionado!')">PLAY</button>
+        </div>
+    </div>
+
+    <script>
+        const characters = [
+            { name: "Loader", img: "https://i.imgur.com/6KTzyqV.png", desc: "Alta resistencia y combate cuerpo a cuerpo.", skills: ["Bullet Punch", "Debris Shield", "Rocket Leap"], state: "unlocked" },
+            { name: "Sniper", img: "https://i.imgur.com/2qOaEoB.png", desc: "Ataques de largo alcance y precisión extrema.", skills: ["Aimed Shot", "Camouflage", "Critical Focus"], state: "new" },
+            { name: "Engineer", img: "https://i.imgur.com/z7Eslbp.png", desc: "Crea torretas y barreras defensivas.", skills: ["Deploy Turret", "Shield Dome", "Repair Bot"], state: "unlocked" },
+            { name: "Medic", img: "https://i.imgur.com/oqFGD4T.png", desc: "Especialista en curar y apoyar aliados.", skills: ["Heal Beam", "Revive", "Protective Mist"], state: "locked" },
+            { name: "Scout", img: "https://i.imgur.com/5H0iFYi.png", desc: "Rápido, ágil y experto en exploración.", skills: ["Dash", "Stealth", "Pulse Shot"], state: "unlocked" },
+            { name: "Pyro", img: "https://i.imgur.com/v8bZtuE.png", desc: "Controla el fuego con ataques en área.", skills: ["Flame Burst", "Fire Wall", "Explosion Core"], state: "new" },
+            { name: "Rogue", img: "https://i.imgur.com/RvQxIvi.png", desc: "Asesino veloz con ataques críticos.", skills: ["Backstab", "Shadow Step", "Poison Blade"], state: "unlocked" },
+            { name: "Cyborg", img: "https://i.imgur.com/vwqyl6Y.png", desc: "Fusión de humano y máquina adaptable.", skills: ["Laser Beam", "EMP Blast", "Overdrive"], state: "locked" },
+        ];
+
+        const grid = document.getElementById("charGrid");
+        const nameBox = document.getElementById("charName");
+        const imgBox = document.getElementById("charImage");
+        const descBox = document.getElementById("charDesc");
+        const skillsBox = document.getElementById("skills");
+
+        characters.forEach((c, i) => {
+            const div = document.createElement("div");
+            div.classList.add("character");
+            if (c.state === "locked") div.classList.add("locked");
+            if (c.state === "new") div.classList.add("new");
+            div.textContent = c.name;
+            div.addEventListener("click", () => selectCharacter(i, div));
+            grid.appendChild(div);
+        });
+
+        function selectCharacter(index, element) {
+            const c = characters[index];
+            if (c.state === "locked") return;
+            document.querySelectorAll(".character").forEach(x => x.classList.remove("selected"));
+            element.classList.add("selected");
+            nameBox.textContent = c.name;
+            imgBox.src = c.img;
+            descBox.textContent = c.desc;
+            skillsBox.innerHTML = `<h3>SKILLS</h3>` + c.skills.map(s => `<div class='skill'>${s}</div>`).join("");
+        }
+    </script>
+</body>
+
+</html>
